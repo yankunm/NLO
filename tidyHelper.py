@@ -1,5 +1,9 @@
+# Import the necessary packages
+import matplotlib.pyplot as plt
 import numpy as np
 import tidy3d as td
+import tidy3d.web as web
+import scienceplots
 
 def wvl_range(wvl_min, wvl_max, N):
     fr = td.FreqRange.from_wvl_interval(wvl_min=wvl_min, wvl_max=wvl_max)
@@ -8,9 +12,9 @@ def wvl_range(wvl_min, wvl_max, N):
     freq0 = fr.freq0
     lda0 = td.C_0 / fr.freq0
     fwidth = fr.fmax - fr.fmin
-    return freqs, freq0, lda0, fwidth
+    return fr, freqs, freq0, lda0, fwidth
 
-def domain_size(structure_height, substrate_height, periodicity):
+def domain_size(structure_height, periodicity, substrate_height=0):
     h = structure_height  # Height of cylinder
     spc = substrate_height + 3
     Lz = spc + h + spc + h

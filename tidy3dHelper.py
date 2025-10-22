@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path # a Python tool for working with file and folder paths safely across operating systems
 from tidy3d.plugins.dispersion import FastDispersionFitter
+import scienceplots
+# this uses scienceplots to make plots look better
+plt.style.use(['science', 'notebook', 'grid'])
+
 
 def help():
     print("=" * 60)
@@ -77,3 +81,18 @@ def define_simulation_parameters(wvl_min, wvl_max, Nfreq=101, Mesh=32, run_facto
         "run_time": run_time,
         "Nfreq": Nfreq,
     }
+
+def plot_sim(sim, save_as=None):
+    # Always visualize simulation before running
+    fig, (ax1,ax2,ax3) = plt.subplots(1, 3, tight_layout=True, figsize=(12, 6))
+    ax1.tick_params(axis='x', labelsize=7)
+    ax2.tick_params(axis='x', labelsize=7)
+    sim.plot(x=0, ax=ax1)
+    sim.plot_grid(x=0, ax=ax1)
+    sim.plot(y=0, ax=ax2)
+    sim.plot_grid(y=0, ax=ax2)
+    sim.plot(z=0, ax=ax3)
+    sim.plot_grid(z=0, ax=ax3)
+    if save_as:
+        plt.savefig(f'infinite_structure.png', dpi=300)
+    plt.show()

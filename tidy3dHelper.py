@@ -2,6 +2,8 @@ import tidy3d as td
 from tidy3d import web
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path # a Python tool for working with file and folder paths safely across operating systems
+from tidy3d.plugins.dispersion import FastDispersionFitter
 
 def help():
     print("=" * 60)
@@ -32,12 +34,14 @@ def help():
     print("=" * 60)
 
 
-def define_simulation_parameters(wvl_min, wvl_max, wvl_sel, Nfreq=101, Mesh=32, run_factor=200):
+def define_simulation_parameters(wvl_min, wvl_max, Nfreq=101, Mesh=32, run_factor=200):
     """
     Define and print the basic physical setup for a Tidy3D simulation.
     Returns a dictionary with all key parameters.
     """
     fr = td.FreqRange.from_wvl_interval(wvl_min=wvl_min, wvl_max=wvl_max)
+    freqs = fr.freqs(Nfreq)
+    wvls = td.C_0 / freqs
     freq0 = fr.freq0
     lda0 = td.C_0 / freq0
     freqw = fr.fmax - fr.fmin
@@ -49,18 +53,21 @@ def define_simulation_parameters(wvl_min, wvl_max, wvl_sel, Nfreq=101, Mesh=32, 
     print("=" * 60)
     print(f"{'BASIC SIMULATION SETUP':^65}")
     print("=" * 60)
-    print(f"{'Wavelength range':<32}: {wvl_min:.4f} µm – {wvl_max:.4f} µm")
-    print(f"{'["Nfreq"] Number of points':<32}: {Nfreq}")
-    print(f"{'["freq0"] Central Frequency':<32}: {freq0:.6e} Hz")
-    print(f"{'["fmin"]  Minimum Frequency':<32}: {fr.fmin:.6e} Hz")
-    print(f"{'["fmax"]  Maximum Frequency':<32}: {fr.fmax:.6e} Hz")
-    print(f"{'["freqw"] Bandwidth':<32}: {freqw:.6e} Hz")
-    print(f"{'["lda0"]  Central λ':<32}: {lda0:.6e} m")
-    print(f"{'["Mesh"]  Mesh cells per λ':<32}: {Mesh}")
-    print(f"{'["run_time"] Simulation run time':<32}: {run_time:.6e} s")
+    print(f"{'[wvls] Wavelength array':<40}: {wvl_max:.4f} µm to {wvl_min:.4f} µm")
+    print(f"{'[freqs] Frequency array':<40}: {fr.fmin:.4e} Hz to {fr.fmax:.4e} Hz")
+    print(f"{'[Nfreq] Number of points':<40}: {Nfreq}")
+    print(f"{'[freq0] Central Frequency':<40}: {freq0:.6e} Hz")
+    print(f"{'[fmin]  Minimum Frequency':<40}: {fr.fmin:.6e} Hz")
+    print(f"{'[fmax]  Maximum Frequency':<40}: {fr.fmax:.6e} Hz")
+    print(f"{'[freqw] Bandwidth':<40}: {freqw:.6e} Hz")
+    print(f"{'[lda0]  Central λ':<40}: {lda0:.6e} m")
+    print(f"{'[Mesh]  Mesh cells per λ':<40}: {Mesh}")
+    print(f"{'[run_time] Simulation run time':<40}: {run_time:.6e} s")
     print("=" * 60 + "\n")
 
     return {
+        "wvls" : wvls,
+        "freqs" : freqs,
         "freq0": freq0,
         "lda0": lda0,
         "freqw": freqw,
